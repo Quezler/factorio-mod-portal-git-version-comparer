@@ -63,6 +63,10 @@ foreach ($releases as $release) {
         $zip->close();
     }
 
+    $nested_directory = $pathname_unzipped . '/' . str_replace('.zip', '', $release['file_name']);
+    if (file_exists($nested_directory))
+        $pathname_unzipped = $nested_directory;
+
     $new_dotgit_pathname = $pathname_unzipped . '/.git';
     rename($pathname_dotgit, $new_dotgit_pathname);
     $pathname_dotgit = $new_dotgit_pathname;
