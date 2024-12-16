@@ -12,13 +12,23 @@ $mod_name = end($mod_name);
 
 dump($mod_name);
 
-$guzzle = new GuzzleHttp\Client();
+$guzzle = new GuzzleHttp\Client([
+    'headers' => [
+        'user-agent' => 'https://github.com/Quezler/factorio-mod-portal-git-version-comparer',
+    ],
+]);
 
 $body = $guzzle->get("https://mods.factorio.com/api/mods/{$mod_name}/full")->getBody()->getContents();
 $json = json_decode($body, true);
 
 //dump($json);
 $releases = $json['releases'];
+
+$repository_directory = __DIR__ . '/repositories/' . $mod_name;
+if (!file_exists($repository_directory)) {
+    mkdir($repository_directory);
+    passthru("cd {$repository_directory} && git init");
+}
 
 $dotenv = new Dotenv();
 $dotenv->load(__DIR__ . '/.env');
@@ -40,5 +50,9 @@ foreach ($releases as $release) {
         file_put_contents($pathname, $file);
     }
 
-    // todo: unzip
+    $zip = new ZipArchive;
+    $zip->open($pathname);
+//    $zip->extractTo(__DIR__ . '/downloads/' . $mod_name);
+    $zip->extractTo(str_replace('.zip', '', $pathname));
+    $zip->close();
 }
