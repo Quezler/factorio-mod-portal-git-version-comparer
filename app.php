@@ -30,6 +30,8 @@ if (!file_exists($repository_directory)) {
     passthru("cd {$repository_directory} && git init");
 }
 
+$pathname_dotgit = $repository_directory . '/.git';
+
 $dotenv = new Dotenv();
 $dotenv->load(__DIR__ . '/.env');
 
@@ -58,4 +60,12 @@ foreach ($releases as $release) {
         $zip->extractTo($pathname_unzipped);
         $zip->close();
     }
+
+    $new_dotgit_pathname = $pathname_unzipped . '/.git';
+    rename($pathname_dotgit, $new_dotgit_pathname);
+    $pathname_dotgit = $new_dotgit_pathname;
+
+    passthru("cd {$pathname_unzipped} && git add -A && git commit -m '{$release['version']}'");
 }
+
+rename($pathname_dotgit, $repository_directory . '/.git');
