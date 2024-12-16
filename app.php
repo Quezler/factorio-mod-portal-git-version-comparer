@@ -25,10 +25,11 @@ $json = json_decode($body, true);
 $releases = $json['releases'];
 
 $repository_directory = __DIR__ . '/repositories/' . $mod_name;
-if (!file_exists($repository_directory)) {
-    mkdir($repository_directory);
-    passthru("cd {$repository_directory} && git init");
-}
+if (file_exists($repository_directory))
+    exec("rm -rf {$repository_directory}");
+
+mkdir($repository_directory);
+passthru("cd {$repository_directory} && git init");
 
 $pathname_dotgit = $repository_directory . '/.git';
 
@@ -36,6 +37,7 @@ $dotenv = new Dotenv();
 $dotenv->load(__DIR__ . '/.env');
 
 foreach ($releases as $release) {
+//    dd($release);
     dump($release['file_name']);
     $pathname = __DIR__ . '/downloads/' . $release['file_name'];
 
@@ -65,7 +67,7 @@ foreach ($releases as $release) {
     rename($pathname_dotgit, $new_dotgit_pathname);
     $pathname_dotgit = $new_dotgit_pathname;
 
-    passthru("cd {$pathname_unzipped} && git add -A && git commit -m '{$release['version']}'");
+    passthru("cd {$pathname_unzipped} && git add -A && git commit -m '{$release['version']}' --date='${release['released_at']}'");
 }
 
 rename($pathname_dotgit, $repository_directory . '/.git');
