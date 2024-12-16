@@ -50,9 +50,12 @@ foreach ($releases as $release) {
         file_put_contents($pathname, $file);
     }
 
-    $zip = new ZipArchive;
-    $zip->open($pathname);
-//    $zip->extractTo(__DIR__ . '/downloads/' . $mod_name);
-    $zip->extractTo(str_replace('.zip', '', $pathname));
-    $zip->close();
+    $pathname_unzipped = str_replace('.zip', '', $pathname);
+    if (!file_exists($pathname_unzipped)) {
+        $zip = new ZipArchive;
+        $zip->open($pathname);
+//        $zip->extractTo(__DIR__ . '/downloads/' . $mod_name);
+        $zip->extractTo($pathname_unzipped);
+        $zip->close();
+    }
 }
