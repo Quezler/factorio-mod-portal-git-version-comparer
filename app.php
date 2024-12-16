@@ -74,4 +74,4 @@ foreach ($releases as $release) {
     passthru("cd {$pathname_unzipped} && git add -A && git commit -m '{$release['version']}' --date='${release['released_at']}'");
 }
 
-rename($pathname_dotgit, $repository_directory . '/.git');
+rename($pathname_unzipped, $repository_directory);
